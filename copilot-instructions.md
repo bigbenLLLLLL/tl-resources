@@ -44,10 +44,19 @@ Frontend specifics (`frontend/`)
 
 Backend specifics (`backend/`)
 
-- Entry: `backend/src/index.ts` (Express server). Config loader at `backend/src/utils/config.ts` reads root `.env`.
-- Dev: `pnpm -C backend dev` (uses `tsx watch src/index.ts`).
-- Prisma: schema in `backend/prisma/schema.prisma`. Use `pnpm -C backend run prisma` scripts if needed.
-- Vitest config: `backend/vitest.config.ts` (uses `node` environment).
+- Layout: the backend follows a layered structure to separate concerns:
+  - `backend/src/routes/` — HTTP route definitions that compose controllers.
+  - `backend/src/controllers/` — translate HTTP requests to service calls and return responses.
+  - `backend/src/services/` — business logic and orchestration.
+  - `backend/src/models/` — TypeScript domain models and types.
+  - `backend/src/repositories/` — data access code (Prisma client usage lives here).
+  - `backend/src/utils/` — shared utilities and config (e.g., `config.ts`).
+
+- Entry: `backend/src/index.ts` (wires middleware, routes and starts Express). `backend/src/utils/config.ts` reads the repo `.env` by default.
+- Dev: `pnpm -C backend dev` (starts the backend dev script defined in `backend/package.json`).
+- Debug: use the VS Code `launch.json` configuration to run `pnpm -C backend run dev` or attach to `--inspect` port.
+- Prisma: schema in `backend/prisma/schema.prisma`. Place repository-level DB access in `backend/src/repositories/` and call from services.
+- Tests: `backend/vitest.config.ts` (node environment) — place unit tests alongside modules (e.g., `services/*.test.ts`).
 
 Shared specifics (`shared/`)
 

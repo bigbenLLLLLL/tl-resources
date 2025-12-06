@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest';
 
 describe('backend basic', () => {
   it('adds numbers', () => {
-    expect(2 + 3).toBe(5)
-  })
-})
+    expect(2 + 3).toBe(5);
+  });
+});
