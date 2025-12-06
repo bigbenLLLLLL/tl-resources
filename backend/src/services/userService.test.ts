@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as authService from './authService';
+import * as userService from './userService';
 import * as userRepo from '../repositories/userRepository';
 import bcrypt from 'bcrypt';
 
 vi.mock('../repositories/userRepository');
 vi.mock('bcrypt');
 
-describe('authService.registerUser', () => {
+describe('userService.registerUser', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -20,7 +20,7 @@ describe('authService.registerUser', () => {
       passwordHash: 'hashed',
     });
 
-    const res = await authService.registerUser({
+    const res = await userService.registerUser({
       email: 'a@b.com',
       password: 'pass',
       firstName: 'A',
@@ -36,7 +36,7 @@ describe('authService.registerUser', () => {
   it('throws 409 if email exists', async () => {
     (userRepo.findUserByEmail as any).mockResolvedValue({ id: 2, email: 'a@b.com' });
     await expect(
-      authService.registerUser({ email: 'a@b.com', password: 'x' }),
+      userService.registerUser({ email: 'a@b.com', password: 'x' }),
     ).rejects.toMatchObject({ status: 409 });
   });
 });

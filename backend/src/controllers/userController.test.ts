@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as authController from './authController';
-import * as authService from '../services/authService';
+import * as userController from './userController';
+import * as userService from '../services/userService';
 
-vi.mock('../services/authService');
+vi.mock('../services/userService');
 
 const mockRes = () => {
   const res: any = {};
@@ -12,7 +12,7 @@ const mockRes = () => {
   return res;
 };
 
-describe('authController.register', () => {
+describe('userController.register', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -20,15 +20,15 @@ describe('authController.register', () => {
   it('returns 400 when missing fields', async () => {
     const req: any = { body: { email: '' } };
     const res = mockRes();
-    await authController.register(req, res, (() => {}) as any);
+    await userController.register(req, res, (() => {}) as any);
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
   it('calls service and returns 201', async () => {
     const req: any = { body: { email: 'a@b.com', password: 'p' } };
     const res = mockRes();
-    (authService.registerUser as any).mockResolvedValue({ id: 1, email: 'a@b.com' });
-    await authController.register(req, res, (() => {}) as any);
+    (userService.registerUser as any).mockResolvedValue({ id: 1, email: 'a@b.com' });
+    await userController.register(req, res, (() => {}) as any);
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({ id: 1, email: 'a@b.com' });
   });
