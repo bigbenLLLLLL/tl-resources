@@ -1,21 +1,18 @@
 import bcrypt from 'bcrypt';
 import { findUserByEmail, createUser, CreateUserParams } from '../repositories/userRepository';
+import { HttpError } from '../errors/HttpError';
 
 export const createUserService = async (payload: any) => {
   const email = payload?.email;
   const password = payload?.password;
 
   if (!email || !password) {
-    const err: any = new Error('Invalid input: email and password are required');
-    err.status = 400;
-    throw err;
+    throw new HttpError(400, 'Invalid input: email and password are required', 'INVALID_INPUT');
   }
 
   const existing = await findUserByEmail(email);
   if (existing) {
-    const err: any = new Error('User already exists');
-    err.status = 409;
-    throw err;
+    throw new HttpError(409, 'User already exists', 'USER_EXISTS');
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
