@@ -27,6 +27,9 @@ export const config = {
   isProduction: NODE_ENV === 'production',
   port: toNumber(process.env.PORT, 3000),
   databaseUrl: process.env.DATABASE_URL ?? '',
+  // JWT settings
+  jwtSecret: process.env.JWT_SECRET ?? undefined,
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? undefined,
 };
 
 export type AppConfig = typeof config;

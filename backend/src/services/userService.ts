@@ -28,5 +28,5 @@ export const createUserService = async (payload: CreateUserInput) => {
   const user = await createUser(createParams);
 
   // return only the created user's id for logging
-  return { id: (user as { id: number }).id };
+  return { id: user.id };
 };
