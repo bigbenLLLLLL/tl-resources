@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import logger from '../utils/logger.js';
+import { ZodError } from 'zod';
 import { HttpError } from '../errors/HttpError';
 import { sendFailure } from '../utils/http';
 
@@ -19,6 +20,12 @@ export function errorHandler(err: unknown, req: Request, res: Response) {
   // HttpError (thrown by services)
   if (err instanceof HttpError) {
     return sendFailure(res, err.status, err.message, err.code, err.details);
+  }
+
+  // Zod validation errors -> 422 Unprocessable Entity
+  if (err instanceof ZodError) {
+    const details = err.flatten ? err.flatten() : { issues: err.issues };
+    return sendFailure(res, 422, 'Validation Error', 'VALIDATION_ERROR', details);
   }
 
   // Prisma unique constraint or known DB errors

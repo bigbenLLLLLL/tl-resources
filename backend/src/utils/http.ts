@@ -13,10 +13,6 @@ export function sendSuccess<T = unknown>(res: Response, data?: T, message = 'OK'
   return res.status(status).json(body);
 }
 
-export function sendNoContent(res: Response) {
-  return res.sendStatus(204);
-}
-
 export function sendFailure(
   res: Response,
   status = 500,
