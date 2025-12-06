@@ -48,7 +48,7 @@ Commands:
 cp .env.sample .env
 cd backend
 pnpm install
-pnpm dev      # start dev server (uses `tsx watch src/index.ts`)
+pnpm dev      # start dev server (uses `tsx watch src/server.ts`)
 pnpm build    # tsc build
 pnpm start    # run built app (after build)
 ```

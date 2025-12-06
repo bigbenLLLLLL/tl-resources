@@ -1,9 +1,8 @@
-import express from 'express';
-import usersRouter from './users';
+import { Router } from 'express';
+import { createUser } from '../controllers/userController';
 
-const router = express.Router();
+const router = Router();
 
-// Users API
-router.use('/users', usersRouter);
+router.post('/users', createUser);
 
 export default router;

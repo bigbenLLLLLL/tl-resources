@@ -1,16 +1,23 @@
-import { getPrismaClient } from '../utils/prismaClient';
+import { prisma } from '../prisma/client';
 
-export const createUser = async (data: {
+export type CreateUserParams = {
   email: string;
   passwordHash: string;
   firstName?: string | null;
   lastName?: string | null;
-}) => {
-  const prisma = getPrismaClient();
-  return prisma.user.create({ data });
 };
 
 export const findUserByEmail = async (email: string) => {
-  const prisma = getPrismaClient();
   return prisma.user.findUnique({ where: { email } });
+};
+
+export const createUser = async (data: CreateUserParams) => {
+  return prisma.user.create({
+    data: {
+      email: data.email,
+      passwordHash: data.passwordHash,
+      firstName: data.firstName ?? null,
+      lastName: data.lastName ?? null,
+    },
+  });
 };

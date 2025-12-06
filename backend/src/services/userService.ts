@@ -1,33 +1,37 @@
-import * as userRepo from '../repositories/userRepository';
+import { z } from 'zod';
 import bcrypt from 'bcrypt';
+import { findUserByEmail, createUser, CreateUserParams } from '../repositories/userRepository';
 
-export async function registerUser(payload: {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  password: string;
-}) {
-  const { email, password, firstName, lastName } = payload;
+const createUserSchema = z.object({
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
+  email: z.string().email(),
+  password: z.string().min(6),
+});
 
-  // check existing
-  const existing = await userRepo.findUserByEmail(email);
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+
+export const createUserService = async (payload: CreateUserInput) => {
+  const parsed = createUserSchema.parse(payload);
+
+  const existing = await findUserByEmail(parsed.email);
   if (existing) {
-    const err: any = new Error('Email already registered');
+    const err: any = new Error('User already exists');
     err.status = 409;
     throw err;
   }
 
-  // hash password
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(parsed.password, 10);
 
-  const user = await userRepo.createUser({
-    email,
+  const createParams: CreateUserParams = {
+    email: parsed.email,
     passwordHash,
-    firstName: firstName ?? null,
-    lastName: lastName ?? null,
-  });
-  // remove passwordHash from returned object for safety
-  // @ts-ignore
-  delete user.passwordHash;
-  return user;
-}
+    firstName: parsed.firstName ?? null,
+    lastName: parsed.lastName ?? null,
+  };
+
+  const user = await createUser(createParams);
+
+  // return only the created user's id for logging
+  return { id: (user as any).id };
+};

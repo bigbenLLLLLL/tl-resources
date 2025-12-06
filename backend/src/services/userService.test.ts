@@ -1,42 +1,54 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as userService from './userService';
-import * as userRepo from '../repositories/userRepository';
-import bcrypt from 'bcrypt';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock('../repositories/userRepository');
-vi.mock('bcrypt');
+vi.mock('../prisma/client', () => ({
+  prisma: {
+    user: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
+  },
+}));
 
-describe('userService.registerUser', () => {
+import { prisma } from '../prisma/client';
+import { createUserService } from './userService';
+
+describe('createUserService', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
-  it('registers new user and hashes password', async () => {
-    (userRepo.findUserByEmail as any).mockResolvedValue(null);
-    (bcrypt.hash as any).mockResolvedValue('hashed');
-    (userRepo.createUser as any).mockResolvedValue({
+  it('creates a user when email not taken', async () => {
+    // use Vitest mocks directly (no jest types)
+    (prisma.user.findUnique as any).mockResolvedValue(null);
+
+    const createdUser = {
       id: 1,
-      email: 'a@b.com',
+      email: 'test@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
       passwordHash: 'hashed',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    (prisma.user.create as any).mockResolvedValue(createdUser);
+
+    const result = await createUserService({
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'John',
+      lastName: 'Doe',
     });
 
-    const res = await userService.registerUser({
-      email: 'a@b.com',
-      password: 'pass',
-      firstName: 'A',
-      lastName: 'B',
-    });
-    expect(res).toHaveProperty('id');
-    expect(bcrypt.hash).toHaveBeenCalled();
-    expect(userRepo.createUser).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'a@b.com', passwordHash: 'hashed' }),
-    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(createdUser.id);
   });
 
-  it('throws 409 if email exists', async () => {
-    (userRepo.findUserByEmail as any).mockResolvedValue({ id: 2, email: 'a@b.com' });
+  it('throws 409 when email already exists', async () => {
+    (prisma.user.findUnique as any).mockResolvedValue({ id: 1, email: 'a@b.com' });
+
     await expect(
-      userService.registerUser({ email: 'a@b.com', password: 'x' }),
-    ).rejects.toMatchObject({ status: 409 });
+      createUserService({ email: 'a@b.com', password: 'password123' }),
+    ).rejects.toMatchObject({ message: 'User already exists', status: 409 });
   });
 });

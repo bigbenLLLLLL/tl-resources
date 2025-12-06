@@ -52,7 +52,7 @@ Backend specifics (`backend/`)
   - `backend/src/repositories/` — data access code (Prisma client usage lives here).
   - `backend/src/utils/` — shared utilities and config (e.g., `config.ts`).
 
-- Entry: `backend/src/index.ts` (wires middleware, routes and starts Express). `backend/src/utils/config.ts` reads the repo `.env` by default.
+- Entry: `backend/src/server.ts` (wires middleware, routes and starts Express). `backend/src/utils/config.ts` reads the repo `.env` by default.
 - Dev: `pnpm -C backend dev` (starts the backend dev script defined in `backend/package.json`).
 - Debug: use the VS Code `launch.json` configuration to run `pnpm -C backend run dev` or attach to `--inspect` port.
 - Prisma: schema in `backend/prisma/schema.prisma`. Place repository-level DB access in `backend/src/repositories/` and call from services.
