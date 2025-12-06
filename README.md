@@ -64,3 +64,30 @@ npx cross-env PORT=4000 pnpm -C backend dev
 
 - Optionally, the code can be extended to validate required env vars in production; contact me if you want automatic validation (e.g. fail when `DATABASE_URL` is missing in production).
 
+## Docker (Postgres)
+
+The repository includes a `docker-compose.yml` that runs a stable PostgreSQL 15 image for local development.
+
+Environment variables
+- The compose file reads DB credentials from the repository root `.env`. Ensure these keys exist in `.env`:
+
+```env
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=postgres
+POSTGRES_PORT=5432
+DATABASE_URL="postgresql://user:password@localhost:5432/postgres?schema=public"
+```
+
+Start Postgres
+
+```bash
+docker compose up -d
+```
+
+Stop Postgres and remove containers
+
+```bash
+docker compose down
+```
+
