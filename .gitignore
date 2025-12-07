@@ -29,3 +29,7 @@ dist-ssr
 # turbo
 .turbo
 !/pnpm-lock.yaml
+
+# coverage
+coverage/
+**/coverage/
