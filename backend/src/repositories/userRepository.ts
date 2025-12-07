@@ -1,5 +1,4 @@
 import { prisma } from '../prisma/client';
-import type { User } from '@prisma/client';
 
 export type CreateUserParams = {
   email: string;
@@ -8,11 +7,11 @@ export type CreateUserParams = {
   lastName?: string | null;
 };
 
-export const findUserByEmail = async (email: string): Promise<User | null> => {
+export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({ where: { email } });
 };
 
-export const createUser = async (data: CreateUserParams): Promise<User> => {
+export const createUser = async (data: CreateUserParams) => {
   return prisma.user.create({
     data: {
       email: data.email,
