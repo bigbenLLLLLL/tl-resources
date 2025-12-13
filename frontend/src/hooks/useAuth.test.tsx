@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { actAsync } from '../utils/testUtils';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import AuthProvider from '../providers/AuthProvider';
 import { useAuth } from './useAuth';
@@ -62,7 +62,7 @@ describe('useAuth hook', () => {
 
     await waitFor(() => expect(screen.getByTestId('ready').textContent).toBe('true'));
 
-    await act(async () => {
+    await actAsync(async () => {
       screen.getByTestId('do-auth').click();
     });
 
@@ -81,7 +81,7 @@ describe('useAuth hook', () => {
 
     await waitFor(() => expect(screen.getByTestId('ready').textContent).toBe('true'));
 
-    await act(async () => {
+    await actAsync(async () => {
       screen.getByTestId('do-login').click();
     });
 
@@ -100,13 +100,13 @@ describe('useAuth hook', () => {
     await waitFor(() => expect(screen.getByTestId('ready').textContent).toBe('true'));
 
     // authenticate first
-    await act(async () => {
+    await actAsync(async () => {
       screen.getByTestId('do-auth').click();
     });
 
     await waitFor(() => expect(screen.getByTestId('token').textContent).toBe('t'));
 
-    await act(async () => {
+    await actAsync(async () => {
       screen.getByTestId('do-logout').click();
     });
 
