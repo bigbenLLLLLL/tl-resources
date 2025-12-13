@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { sendSuccess, sendFailure } from './http';
+import { HttpStatus } from '../../../shared/src/types/api';
 
 describe('http utils', () => {
   const makeRes = () => {
@@ -10,27 +11,23 @@ describe('http utils', () => {
 
   it('sendSuccess sends correct shape and status', () => {
     const res = makeRes();
-    // sendSuccess signature: (res, data?, message = 'OK', status = 200)
-    sendSuccess(res, { id: '123' }, 'Created', 201);
+    // sendSuccess signature: sendSuccess(res, { data?, status? })
+    sendSuccess(res, { data: { id: '123' }, status: 201 });
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      status: 201,
-      message: 'Created',
       data: { id: '123' },
     });
   });
 
   it('sendFailure sends correct shape and status', () => {
     const res = makeRes();
-    // sendFailure signature: (res, status = 500, message = 'Internal Server Error', code?: string, details?: unknown)
-    sendFailure(res, 400, 'Bad', 'BAD');
-    expect(res.status).toHaveBeenCalledWith(400);
+    // sendFailure signature: sendFailure(res, { status, code, message, details? })
+    sendFailure(res, { status: HttpStatus.BAD_REQUEST, code: 'BAD_CODE', message: 'Bad' });
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 400,
-      message: 'Bad',
-      error: { code: 'BAD', details: undefined },
+      error: { code: 'BAD_CODE', message: 'Bad' },
     });
   });
 });

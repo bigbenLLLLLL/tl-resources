@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../utils/config';
 import { HttpError } from '../errors/HttpError';
+import { ErrorCode, ErrorMessage, HttpStatus } from '../../../shared/src/types/api';
 
 export interface AuthRequest extends Request {
   userId?: number | string;
@@ -10,7 +11,9 @@ export interface AuthRequest extends Request {
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
   const auth = req.headers['authorization'];
   if (!auth || typeof auth !== 'string' || !auth.startsWith('Bearer ')) {
-    return next(new HttpError(401, 'Missing Authorization', 'UNAUTHORIZED'));
+    return next(
+      new HttpError(HttpStatus.UNAUTHORIZED, ErrorMessage.UNAUTHORIZED, ErrorCode.UNAUTHORIZED),
+    );
   }
 
   const token = auth.slice(7).trim();
@@ -22,7 +25,9 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
     return next();
   } catch (err) {
     console.error('JWT verification failed:', err);
-    return next(new HttpError(401, 'Invalid token', 'UNAUTHORIZED'));
+    return next(
+      new HttpError(HttpStatus.UNAUTHORIZED, ErrorMessage.UNAUTHORIZED, ErrorCode.UNAUTHORIZED),
+    );
   }
 }
 

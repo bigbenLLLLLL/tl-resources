@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authMiddleware } from './auth';
+import { HttpStatus } from '../../../shared/src/types/api';
 import jwt from 'jsonwebtoken';
 
 describe('authMiddleware', () => {
@@ -15,7 +16,7 @@ describe('authMiddleware', () => {
     expect(next).toHaveBeenCalled();
     const err = next.mock.calls[0][0];
     expect(err).toBeDefined();
-    expect(err.status).toBe(401);
+    expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
   it('accepts valid token and sets userId', () => {

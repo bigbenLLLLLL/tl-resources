@@ -47,8 +47,9 @@ describe('createUserService', () => {
   it('throws 409 when email already exists', async () => {
     (prisma.user.findUnique as any).mockResolvedValue({ id: 1, email: 'a@b.com' });
 
+    const { HttpStatus } = await import('../../../shared/src/types/api');
     await expect(
       createUserService({ email: 'a@b.com', password: 'password123' }),
-    ).rejects.toMatchObject({ message: 'User already exists', status: 409 });
+    ).rejects.toMatchObject({ message: 'User already exists', status: HttpStatus.CONFLICT });
   });
 });

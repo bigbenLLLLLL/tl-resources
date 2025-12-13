@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { z } from 'zod';
 import { validate } from './validate';
+import { HttpStatus } from '../../../shared/src/types/api';
 
 describe('validate middleware', () => {
   it('calls next and replaces req.body on valid payload', () => {
@@ -27,7 +28,7 @@ describe('validate middleware', () => {
 
     mw(req, res, next);
 
-    expect(status).toHaveBeenCalledWith(400);
+    expect(status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
     expect(json).toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
   });

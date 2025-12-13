@@ -1,25 +1,31 @@
 import type { Response } from 'express';
+import {
+  ErrorCode,
+  HttpStatus,
+  ErrorMessage,
+  ApiSuccess,
+  ApiFailure,
+  FailureOptions,
+} from '../../../shared/src/types/api';
 
-export type ApiResponse<T = unknown> = {
-  success: boolean;
-  status: number;
-  message?: string;
-  data?: T;
-  error?: { code?: string; details?: unknown };
-};
-
-export function sendSuccess<T = unknown>(res: Response, data?: T, message = 'OK', status = 200) {
-  const body: ApiResponse<T> = { success: true, status, message, data };
-  return res.status(status).json(body);
+export function sendSuccess<T = unknown>(
+  res: Response,
+  opts?: { status?: number | HttpStatus; data?: T },
+) {
+  const { status = HttpStatus.OK, data } = opts || {};
+  const body: ApiSuccess<T> = { success: true } as ApiSuccess<T>;
+  if (data !== undefined) body.data = data as T;
+  return res.status(status as number).json(body);
 }
 
-export function sendFailure(
-  res: Response,
-  status = 500,
-  message = 'Internal Server Error',
-  code?: string,
-  details?: unknown,
-) {
-  const body: ApiResponse = { success: false, status, message, error: { code, details } };
-  return res.status(status).json(body);
+export function sendFailure(res: Response, opts?: FailureOptions) {
+  const {
+    status = HttpStatus.INTERNAL_SERVER_ERROR,
+    code = ErrorCode.INTERNAL_ERROR,
+    message = ErrorMessage.INTERNAL_SERVER_ERROR,
+    details,
+  } = opts || {};
+  const body: ApiFailure = { success: false, error: { code: code as string, message } };
+  if (details !== undefined) body.error.details = details;
+  return res.status(status as number).json(body);
 }
