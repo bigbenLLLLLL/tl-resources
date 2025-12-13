@@ -1,7 +1,7 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import tsParser from '@typescript-eslint/parser'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from '@eslint/js';
+import globals from 'globals';
+import tsParser from '@typescript-eslint/parser';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
   globalIgnores([
@@ -29,6 +29,7 @@ export default defineConfig([
     rules: {
       // Disallow general console usage but allow warn/error/info
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
   {
@@ -37,4 +38,4 @@ export default defineConfig([
       parser: tsParser,
     },
   },
-])
+]);

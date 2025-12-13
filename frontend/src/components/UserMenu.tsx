@@ -3,7 +3,7 @@ import { IconButton, Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material'
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-import { setToken } from '../utils/request';
+import { useAuth } from '../hooks/useAuth';
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -18,9 +18,11 @@ export default function UserMenu() {
     navigate('/dashboard');
   };
 
+  const { logout } = useAuth();
+
   const handleLogout = () => {
     handleClose();
-    setToken(null);
+    logout();
     navigate('/');
   };
 

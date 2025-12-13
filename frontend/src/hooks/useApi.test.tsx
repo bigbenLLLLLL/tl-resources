@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { actAsync, executeAndWait, attachNoopCatch } from '../utils/testUtils';
 import { useApi } from './useApi';
 import { ApiError } from '../utils/ApiErrors';
 
@@ -41,9 +42,7 @@ describe('useApi hook', () => {
 
     // execute and await
     let result: any;
-    await act(async () => {
-      result = await helpers.execute();
-    });
+    result = await executeAndWait(() => helpers.execute());
 
     expect(result).toEqual({ ok: true });
     await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
@@ -59,7 +58,7 @@ describe('useApi hook', () => {
     let helpers: any;
     render(<TestWrapper fn={fn} onReady={(h) => (helpers = h)} />);
 
-    await act(async () => {
+    await actAsync(async () => {
       await expect(helpers.execute()).rejects.toBeInstanceOf(ApiError);
     });
 
@@ -83,28 +82,17 @@ describe('useApi hook', () => {
     let helpers: any;
     render(<TestWrapper fn={fn} onReady={(h) => (helpers = h)} />);
 
-    let caught: any;
     let p1: Promise<any>;
 
-    await act(async () => {
-      p1 = helpers.execute();
-      // attach a catcher immediately so the rejection doesn't become an unhandled rejection
-      (async () => {
-        try {
-          await p1;
-        } catch (e) {
-          caught = e;
-        }
-      })();
+    p1 = helpers.execute();
+    attachNoopCatch(p1);
 
-      // start second execute which should abort first
+    await actAsync(async () => {
       const p2 = helpers.execute();
-      // ensure we catch p2 rejection so unhandled rejections don't occur when the
-      // hook aborts outstanding requests during unmount
-      p2.catch(() => {});
+      attachNoopCatch(p2);
     });
 
-    await waitFor(() => expect(caught).toBeInstanceOf(ApiError));
+    await expect(p1).rejects.toBeInstanceOf(ApiError);
   });
 
   it('retries failed calls up to retry count and succeeds', async () => {
@@ -134,7 +122,7 @@ describe('useApi hook', () => {
 
     render(<RetryWrapper />);
 
-    await act(async () => {
+    await actAsync(async () => {
       const value = await (global as any).__retryExec();
       expect(value).toBe('ok');
     });
@@ -146,13 +134,11 @@ describe('useApi hook', () => {
     let helpers: any;
     render(<TestWrapper fn={fn} onReady={(h) => (helpers = h)} />);
 
-    await act(async () => {
-      await helpers.execute();
-    });
+    await executeAndWait(() => helpers.execute());
 
     expect(screen.getByTestId('data').textContent).toBe(JSON.stringify('x'));
 
-    act(() => {
+    await actAsync(async () => {
       helpers.reset();
     });
 

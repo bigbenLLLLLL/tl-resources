@@ -1,4 +1,3 @@
-// frontend/src/hooks/useApi.ts
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError } from '../utils/ApiErrors';
 

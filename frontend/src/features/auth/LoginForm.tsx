@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AppTextField from '../../components/forms/AppTextField';
 import AppButton from '../../components/ui/AppButton';
 import { login as loginService } from '../../services/authService';
-import { setToken } from '../../utils/request';
+import { useAuth } from '../../hooks/useAuth';
 import { loginSchema, type LoginInput } from '../../../../shared/src/index';
 import { useApi } from '../../hooks/useApi';
 import { ApiError } from '../../utils/ApiErrors';
@@ -20,6 +20,8 @@ export default function LoginForm() {
     (payload: LoginInput, signal?: AbortSignal) => loginService(payload, signal),
     { autoThrow: true },
   );
+
+  const auth = useAuth();
 
   const handleChange = (field: keyof LoginInput) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues((prev) => ({ ...prev, [field]: e.target.value }));
@@ -51,7 +53,8 @@ export default function LoginForm() {
       const data: any = await execute(result.data);
       // data expected { token, id }
       if (data && data.token) {
-        setToken(data.token);
+        // set token via auth provider so app updates reactively
+        auth.authenticate(data.token, data.id ? { id: data.id } : undefined);
         navigate('/');
       } else {
         setServerError('Invalid response from server');
