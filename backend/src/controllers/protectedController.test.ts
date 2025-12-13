@@ -21,8 +21,6 @@ describe('protected hello route', () => {
     expect(status).toHaveBeenCalledWith(200);
     expect(json).toHaveBeenCalledWith({
       success: true,
-      status: 200,
-      message: 'OK',
       data: { message: 'hello world' },
     });
   });

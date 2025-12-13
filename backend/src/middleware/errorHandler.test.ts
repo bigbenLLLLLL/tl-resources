@@ -21,9 +21,7 @@ describe('errorHandler middleware', () => {
     expect(res.status).toHaveBeenCalledWith(409);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 409,
-      message: 'User exists',
-      error: { code: 'USER_EXISTS', details: undefined },
+      error: { code: 'USER_EXISTS', message: 'User exists' },
     });
   });
 
@@ -40,9 +38,7 @@ describe('errorHandler middleware', () => {
     expect(res.status).toHaveBeenCalledWith(422);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 422,
-      message: 'Validation Error',
-      error: { code: 'VALIDATION_ERROR', details: expect.any(Object) },
+      error: { code: 'VALIDATION_ERROR', message: 'Validation Error' },
     });
   });
 
@@ -57,9 +53,7 @@ describe('errorHandler middleware', () => {
     expect(res.status).toHaveBeenCalledWith(409);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 409,
-      message: 'Conflict',
-      error: { code: 'UNIQUE_CONSTRAINT', details: err.meta },
+      error: { code: 'UNIQUE_CONSTRAINT', message: 'Conflict' },
     });
   });
 
@@ -74,9 +68,7 @@ describe('errorHandler middleware', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 500,
-      message: 'Internal Server Error',
-      error: { code: undefined, details: undefined },
+      error: { code: 'INTERNAL_ERROR', message: 'Internal Server Error' },
     });
   });
 });

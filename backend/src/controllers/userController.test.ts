@@ -26,8 +26,6 @@ describe('userController.createUser', () => {
     expect(status).toHaveBeenCalledWith(201);
     expect(json).toHaveBeenCalledWith({
       success: true,
-      status: 201,
-      message: 'User created',
       data: { id: 42 },
     });
   });
@@ -46,9 +44,7 @@ describe('userController.createUser', () => {
     expect(status).toHaveBeenCalledWith(409);
     expect(json).toHaveBeenCalledWith({
       success: false,
-      status: 409,
-      message: 'User exists',
-      error: { code: 'USER_EXISTS', details: undefined },
+      error: { code: 'USER_EXISTS', message: 'User exists' },
     });
   });
 });

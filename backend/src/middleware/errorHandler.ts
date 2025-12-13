@@ -9,7 +9,7 @@ function isPrismaLike(e: unknown): e is { code?: string; meta?: unknown } {
 }
 
 export function notFoundHandler(req: Request, res: Response) {
-  return res.status(404).json({ error: 'Not Found' });
+  return sendFailure(res, 404, 'NOT_FOUND', 'Not Found');
 }
 
 // Express error handler (4 args) — centralizes error -> HTTP mapping
@@ -28,23 +28,23 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
 
   // HttpError (thrown by services)
   if (err instanceof HttpError) {
-    return sendFailure(res, err.status, err.message, err.code, err.details);
+    return sendFailure(res, err.status || 500, err.code || 'ERROR', err.message || 'Error');
   }
 
   // Zod validation errors -> 422 Unprocessable Entity
   if (err instanceof ZodError) {
-    const details = err.flatten ? err.flatten() : { issues: err.issues };
-    return sendFailure(res, 422, 'Validation Error', 'VALIDATION_ERROR', details);
+    // send a validation error with code and message
+    return sendFailure(res, 422, 'VALIDATION_ERROR', 'Validation Error');
   }
 
   // Prisma unique constraint or known DB errors
   // Prisma errors often expose a `code` like 'P2002' for unique constraint
   if (isPrismaLike(err)) {
     if (err.code === 'P2002') {
-      return sendFailure(res, 409, 'Conflict', 'UNIQUE_CONSTRAINT', err.meta ?? err);
+      return sendFailure(res, 409, 'UNIQUE_CONSTRAINT', 'Conflict');
     }
   }
 
   // Fallback: internal server error
-  return sendFailure(res, 500, 'Internal Server Error');
+  return sendFailure(res, 500, 'INTERNAL_ERROR', 'Internal Server Error');
 }

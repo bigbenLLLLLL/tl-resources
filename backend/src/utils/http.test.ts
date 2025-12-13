@@ -10,27 +10,23 @@ describe('http utils', () => {
 
   it('sendSuccess sends correct shape and status', () => {
     const res = makeRes();
-    // sendSuccess signature: (res, data?, message = 'OK', status = 200)
-    sendSuccess(res, { id: '123' }, 'Created', 201);
+    // sendSuccess signature: (res, data?, status = 200)
+    sendSuccess(res, { id: '123' }, 201);
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      status: 201,
-      message: 'Created',
       data: { id: '123' },
     });
   });
 
   it('sendFailure sends correct shape and status', () => {
     const res = makeRes();
-    // sendFailure signature: (res, status = 500, message = 'Internal Server Error', code?: string, details?: unknown)
-    sendFailure(res, 400, 'Bad', 'BAD');
+    // sendFailure signature: (res, status = 500, code = 'INTERNAL_ERROR', message = 'Internal Server Error')
+    sendFailure(res, 400, 'BAD_CODE', 'Bad');
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      status: 400,
-      message: 'Bad',
-      error: { code: 'BAD', details: undefined },
+      error: { code: 'BAD_CODE', message: 'Bad' },
     });
   });
 });

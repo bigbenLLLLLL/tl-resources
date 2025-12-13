@@ -1,25 +1,17 @@
 import type { Response } from 'express';
+import type { ApiSuccess, ApiFailure } from '../../../shared/src/types/api';
 
-export type ApiResponse<T = unknown> = {
-  success: boolean;
-  status: number;
-  message?: string;
-  data?: T;
-  error?: { code?: string; details?: unknown };
-};
-
-export function sendSuccess<T = unknown>(res: Response, data?: T, message = 'OK', status = 200) {
-  const body: ApiResponse<T> = { success: true, status, message, data };
+export function sendSuccess<T = unknown>(res: Response, data?: T, status = 200) {
+  const body: ApiSuccess<T> = { success: true, data: data as T };
   return res.status(status).json(body);
 }
 
 export function sendFailure(
   res: Response,
   status = 500,
+  code = 'INTERNAL_ERROR',
   message = 'Internal Server Error',
-  code?: string,
-  details?: unknown,
 ) {
-  const body: ApiResponse = { success: false, status, message, error: { code, details } };
+  const body: ApiFailure = { success: false, error: { code, message } };
   return res.status(status).json(body);
 }

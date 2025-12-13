@@ -100,12 +100,34 @@ export async function request<T = any>(path: string, opts: RequestOptions = {}):
   }
 
   if (!res.ok) {
+    // If backend follows shared ApiResponse shape, try to extract error message
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      'success' in parsed &&
+      parsed.success === false &&
+      parsed.error
+    ) {
+      const errObj = (parsed as any).error;
+      const message = errObj?.message || res.statusText || '请求出错';
+      throw new ApiError(message, res.status, parsed);
+    }
+
     const message = (parsed && parsed.message) || res.statusText || '请求出错';
     throw new ApiError(message, res.status, parsed);
   }
 
   // 204 No Content
   if (res.status === 204) return undefined as unknown as T;
+
+  // If backend returns shared ApiResponse<T> shape, unwrap data
+  if (parsed && typeof parsed === 'object' && 'success' in parsed) {
+    if ((parsed as any).success === true) return (parsed as any).data as T;
+    // success === false was already handled above for non-ok responses, but handle defensively
+    const errObj = (parsed as any).error;
+    const message = errObj?.message || '请求出错';
+    throw new ApiError(message, res.status, parsed);
+  }
 
   return parsed as T;
 }
