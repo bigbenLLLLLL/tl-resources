@@ -1,5 +1,6 @@
 // frontend/src/services/request.ts
 import type { ApiResponse, ApiFailure } from '../../../shared/src/types/api';
+import { HttpStatus, ErrorCode } from '../../../shared/src/types/api';
 import { ApiError } from './ApiErrors';
 
 /** Allowed HTTP methods */
@@ -106,7 +107,7 @@ export async function request<T = any>(
   let payload: any = null;
 
   // Short-circuit No Content
-  if (res.status === 204) return undefined as unknown as T;
+  if (res.status === HttpStatus.NO_CONTENT) return undefined as unknown as T;
 
   if (isJson) {
     try {
@@ -138,7 +139,7 @@ export async function request<T = any>(
 
     const message = payload?.message || res.statusText || 'Request failed';
 
-    throw new ApiError(message, undefined, payload, res.status, payload);
+    throw new ApiError(message, ErrorCode.INTERNAL_ERROR, payload, res.status, payload);
   }
 
   if (isJson) {
@@ -158,7 +159,13 @@ export async function request<T = any>(
       );
     }
 
-    throw new ApiError('Invalid API response format', undefined, payload, res.status, payload);
+    throw new ApiError(
+      'Invalid API response format',
+      ErrorCode.ERROR,
+      payload,
+      res.status,
+      payload,
+    );
   }
   return payload as T;
 }
