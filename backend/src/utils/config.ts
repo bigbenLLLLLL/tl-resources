@@ -6,12 +6,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Compute repo root: backend/src/utils -> backend -> repo root
+// Compute backend directory (backend/src/utils -> backend)
 const backendDir = path.resolve(__dirname, '..', '..');
-const repoRoot = path.resolve(backendDir, '..');
 
-// Only load repo root .env (explicit path). If it doesn't exist, dotenv.config() will no-op.
-const dotenvPath = path.join(repoRoot, '.env');
+// Load `.env` from the backend package directory. If it doesn't exist, dotenv.config() will no-op.
+const dotenvPath = path.join(backendDir, '.env');
 dotenv.config({ path: dotenvPath });
 
 // Determine environment
